@@ -19,7 +19,7 @@ class Game
     end
 
     set_mystery_word_length
-    play_game
+    # play_game
 
 
   end
@@ -34,18 +34,23 @@ class Game
   end
 
   def play_game
-    until self.guess_progress == self.word_length
+    puts "The game is starting! Your word is: #{self.guess_progress}"
+
+    until !self.guess_progress.include?("_")
+      puts "So far, the guessed letters are: #{self.guessed_letters}."
       current_guess = guessing_player.make_guess
+      self.guessed_letters << current_guess
       letter_locs = picking_player.handle_guess( current_guess )
 
       # update guess progress
       letter_locs.each do |index|
+
         self.guess_progress[index] = current_guess
       end
 
       display_word
     end
-    puts "You win! The word was: #{self.guess_progress}."
+    puts "You win! The word was: #{self.guess_progress}, and you guessed in #{self.guessed_letters.length} guesses."
   end
 
 end
@@ -58,7 +63,7 @@ class HumanPlayer
   end
 
   def make_guess
-    puts "Guess a letter: "
+    print "Guess a letter: "
     guess = gets.chomp
   end
 
@@ -80,6 +85,7 @@ class ComputerPlayer
   # will return the length of the picked word
   def pick_mystery_word
     @picked_word = self.dict.sample
+    self.picked_word.length
   end
 
   # guesses random word of appropriate length
@@ -88,15 +94,17 @@ class ComputerPlayer
   end
 
   def handle_guess( guess )
-    if self.picked_word.include?( guess )
-      picked_word_arr = self.picked_word.split("")
+    guess_locations = []
 
-      picked_word_arr.each_with_index.map do |char, index|
-        index if picked_word_arr[index] == char
+    if self.picked_word.include?( guess )
+      # picked_word_arr = self.picked_word.split("")
+
+      0.upto(self.picked_word.length-1) do |index|
+        guess_locations << index if self.picked_word[index] == guess
       end
-    else
-      []
+
     end
+    guess_locations
   end
 
 end
